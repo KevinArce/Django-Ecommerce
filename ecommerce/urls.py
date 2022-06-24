@@ -13,9 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path
+from django.contrib import admin # import admin module from django.contrib
+from django.urls import include, path # import include and path functions from django.urls module to use them in the urls.py file to define the URL patterns
+import debug_toolbar # import debug_toolbar module from django.contrib
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), # define the URL pattern for the admin site
+    path('playground/', include('playground.urls')), # define the URL patterns for the playground app 
+    path('__debug__/', include('debug_toolbar.urls')), # define the URL patterns for the debug toolbar
 ]
