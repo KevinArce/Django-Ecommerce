@@ -1,12 +1,15 @@
 from django.db import models
 
+class Collection(models.Model):
+    title = models.CharField(max_length=255)
+
 class Product(models.Model):
     title = models.CharField(max_length=255) # max_length is the maximum number of characters in the field
     description = models.TextField(blank=True) # blank=True means that the field is optional
     price = models.DecimalField(max_digits=6, decimal_places=2) # max_digits is the maximum number of digits in the field, decimal_places is the number of decimal places
     inventory = models.IntegerField(default=0) # default=0 means that the field will be set to 0 by default
     last_update = models.DateTimeField(auto_now=True) # auto_now=True means that the field will be set to the current date and time whenever the model is saved
-
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT) # on_delete=models.PROTECT means that the product will not be deleted if the collection is deleted
 
 class Customer(models.Model):
 
@@ -40,11 +43,27 @@ class Order(models.Model):
     placed_at = models.DateTimeField(auto_now_add=True) # auto_now_add=True means that the field will be set to the current date and time whenever the model is saved
     payment_status = models.CharField(
     max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING) # default=PAYMENT_STATUS_PENDING means that the field will be set to PAYMENT_STATUS_PENDING by default
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT) # on_delete=models.PROTECT means that the order will not be deleted if the customer is deleted
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.PROTECT) # on_delete=models.PROTECT means that the order item will not be deleted if the order is deleted
+    product = models.ForeignKey(Product, on_delete=models.PROTECT) # on_delete=models.PROTECT means that the order item will not be deleted if the product is deleted
+    quantity = models.PositiveSmallIntegerField() # PositiveSmallIntegerField means that the field will be set to a positive integer
+    unit_price = models.DecimalField(max_digits=6, decimal_places=2) # max_digits is the maximum number of digits in the field, decimal_places is the number of decimal places
+
 
 class Address(models.Model):
     street = models.CharField(max_length=255) # max_length is the maximum number of characters in the field
     city = models.CharField(max_length=255) # max_length is the maximum number of characters in the field
-    customer = models.OneToOneField( # OneToOneField means that there can only be one address per customer
-    Customer, on_delete=models.CASCADE, # on_delete=models.CASCADE means that the address will be deleted when the customer is deleted (on_delete=models.CASCADE is the default value)
-    primary_key=True) # primary_key=True means that the field will be the primary key of the model
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE) # on_delete=models.CASCADE means that the customer will be deleted whenever the address is deleted
+
+
+class Cart(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True) # auto_now_add=True means that the field will be set to the current date and time whenever the model is saved
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE) # on_delete=models.CASCADE means that the cart item will be deleted whenever the cart is deleted
+    product = models.ForeignKey(Product, on_delete=models.CASCADE) # on_delete=models.CASCADE means that the cart item will be deleted whenever the product is deleted
+    quantity = models.PositiveSmallIntegerField() # PositiveSmallIntegerField means that the field will be set to a positive integer
     
