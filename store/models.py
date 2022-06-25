@@ -1,7 +1,12 @@
 from django.db import models
 
+class Promotion(models.Model):
+    description = models.CharField(max_length=255)
+    discount = models.FloatField()
+
 class Collection(models.Model):
     title = models.CharField(max_length=255)
+    featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+') # null=True, related_name='+' means that the reverse relationship is not required
 
 class Product(models.Model):
     title = models.CharField(max_length=255) # max_length is the maximum number of characters in the field
@@ -10,6 +15,9 @@ class Product(models.Model):
     inventory = models.IntegerField(default=0) # default=0 means that the field will be set to 0 by default
     last_update = models.DateTimeField(auto_now=True) # auto_now=True means that the field will be set to the current date and time whenever the model is saved
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT) # on_delete=models.PROTECT means that the product will not be deleted if the collection is deleted
+    promotions = models.ManyToManyField(
+    Promotion, blank=True) # blank=True means that the field is optional. 
+    # ManyToManyField means that there can be many products in a collection, and there can be many collections in a product.
 
 class Customer(models.Model):
 
@@ -67,3 +75,4 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE) # on_delete=models.CASCADE means that the cart item will be deleted whenever the product is deleted
     quantity = models.PositiveSmallIntegerField() # PositiveSmallIntegerField means that the field will be set to a positive integer
     
+ 
