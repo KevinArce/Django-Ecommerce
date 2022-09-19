@@ -6,9 +6,8 @@ from django.http import HttpResponse
 # request handler for the home page
 
 def calculate():
-    x = 1
     y = 2
-    return x
+    return 1
 
 def say_hello(request):
     x = calculate()
